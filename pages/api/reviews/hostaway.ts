@@ -28,7 +28,7 @@ export default async function handler(
     // Normalize all reviews
     const normalizedReviews = hostawayReviews.map(normalizeReview);
 
-    // Get approval status from database
+    // Get approval status from in-memory store
     const approvals = await prisma.reviewApproval.findMany();
     const approvalMap = new Map(approvals.map((a) => [a.reviewId, a.approved]));
 

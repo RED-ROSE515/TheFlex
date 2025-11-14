@@ -66,7 +66,7 @@ export default async function handler(
       normalizeGoogleReview(review, finalPlaceId, listingNameForReviews)
     );
 
-    // Get approval status from database (Google reviews are auto-approved by default)
+    // Get approval status from in-memory store (Google reviews are auto-approved by default)
     const approvals = await prisma.reviewApproval.findMany();
     const approvalMap = new Map(approvals.map((a) => [a.reviewId, a.approved]));
 

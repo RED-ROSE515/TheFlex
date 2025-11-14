@@ -145,19 +145,23 @@ export default async function handler(
     // Fetch reviews from Hostaway API
     const hostawayReviews = await fetchHostawayReviews();
 
-    // Get all approved reviews
+    // Get all approved reviews from in-memory store
     const approvals = await prisma.reviewApproval.findMany({
       where: { approved: true },
     });
-
     const approvedIds = new Set(approvals.map((a) => a.reviewId));
 
-    // Normalize and filter reviews
+    // Normalize and filter reviews - only return approved and published reviews
     let normalizedReviews = hostawayReviews
       .map(normalizeReview)
-      .filter(
-        (review) => approvedIds.has(review.id) && review.status === "published"
-      );
+      .filter((review) => {
+        // If there are any approvals stored, only return approved reviews
+        // Otherwise, return all published reviews (for initial state)
+        if (approvals.length > 0) {
+          return approvedIds.has(review.id) && review.status === "published";
+        }
+        return review.status === "published";
+      });
 
     // Filter by listing if provided
     // Try to match by exact name, internalListingName, or externalListingName
