@@ -26,7 +26,7 @@ export default async function handler(
       });
     }
 
-    let finalPlaceId = placeId as string;
+    let finalPlaceId: string | null = (placeId as string) || null;
 
     // If address is provided but no placeId, try to find it
     if (!finalPlaceId && address) {
@@ -34,12 +34,19 @@ export default async function handler(
         address as string,
         listingName as string | undefined
       );
-      
+
       if (!finalPlaceId) {
         return res.status(404).json({
           error: "Could not find Google Place ID for the provided address",
         });
       }
+    }
+
+    // At this point, finalPlaceId must be a string
+    if (!finalPlaceId) {
+      return res.status(400).json({
+        error: "Place ID is required",
+      });
     }
 
     // Fetch Google Reviews
@@ -54,8 +61,7 @@ export default async function handler(
     }
 
     // Normalize reviews to Hostaway format
-    const listingNameForReviews =
-      (listingName as string) || "Unknown Property";
+    const listingNameForReviews = (listingName as string) || "Unknown Property";
     const normalizedReviews = googleReviews.map((review) =>
       normalizeGoogleReview(review, finalPlaceId, listingNameForReviews)
     );
@@ -90,4 +96,3 @@ export default async function handler(
     });
   }
 }
-

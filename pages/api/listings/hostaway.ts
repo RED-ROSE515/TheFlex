@@ -3,7 +3,9 @@ import { fetchHostawayListings } from "@/lib/hostawayListings";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<{ status: string; result: any[] } | { error: string }>
+  res: NextApiResponse<
+    { status: string; result: any[] } | { error: string; details?: any }
+  >
 ) {
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
